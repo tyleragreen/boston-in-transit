@@ -1,1 +1,26 @@
-<h1>Hello, World!</h1>
+<html ng-app>
+  <head>
+    <script>
+      function Controller($scope) {
+        var socket = io.connect();
+        
+        $scope.last_updated = '';
+        
+        socket.on('update', function(data) {
+          $scope.last_updated = data.date;
+          $scope.$apply();
+        });
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container" ng-controller="Controller">
+      <p ng-bind="last_updated"></p>
+    </div>
+    <h1>Hello, World!</h1>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/angular.min.js"></script>
+  </body>
+</html>
