@@ -5,15 +5,35 @@
         var socket = io.connect();
         var lat = '';
         var long = '';
+        var vehicles = {};
+        var markers = {};
         
         $scope.last_updated = '';
         
         socket.on('update', function(data) {
           $scope.last_updated = data.date;
-          lat = data.entities.vehicle.position.latitude;
-          long = data.entities.vehicle.position.longitude;
+          data.entities.forEach(function(entity) {
+            var properties = {
+              lat: entity.vehicle.position.latitude,
+              long: entity.vehicle.position.longitude
+            };
+            vehicles[entity.vehicle.vehicle.id] = properties;
+            if (markers[entity.vehicle.vehicle.id] == null) {
+              var marker = L.marker([properties.lat, properties.long], {
+                  icon: L.mapbox.marker.icon({
+                    'marker-color': '#f86767'
+                  })
+              });
+              
+              markerLayer.addLayer(marker);
+              markers[entity.vehicle.vehicle.id] = marker;
+            }
+            else
+            {
+              markers[entity.vehicle.vehicle.id].setLatLng(L.latLng(properties.lat,properties.long));
+            }
+          });
           $scope.$apply();
-          marker.setLatLng(L.latLng(lat,long));
         });
       }
     </script>
@@ -21,7 +41,7 @@
     <link href='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css' rel='stylesheet' />
     <style>
   body { margin:0; padding:0; }
-  #map { position:absolute; top:50; bottom:0; width:80%; }
+  #map { position:absolute; top:50; bottom:0; width:100%; }
 </style>
   </head>
   <body>
@@ -33,13 +53,7 @@
       L.mapbox.accessToken = 'pk.eyJ1IjoiZ3JlZW50IiwiYSI6ImNpazBqdWFsOTM5Nnh2M2x6dWZ2dnB3aHkifQ.97-pFPD8lQf02B6edag1rA';
       var map = L.mapbox.map('map', 'mapbox.streets')
           .setView([42.358056, -71.063611], 10);
-      var marker = L.marker([42.358056, -71.063611], {
-          icon: L.mapbox.marker.icon({
-            'marker-color': '#f86767'
-          })
-      });
-      
-      marker.addTo(map);
+      var markerLayer = L.mapbox.featureLayer(null).addTo(map);
     </script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/jquery.min.js"></script>
