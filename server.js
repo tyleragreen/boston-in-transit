@@ -25,7 +25,7 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function() 
   console.log("Server listening at", addr.address + ":" + addr.port);
 });
 
-setInterval(function() {
+var fetchData = function() {
   console.log("Fetching API...");
   request(requestSettings, function(error, response, body) {
     if (!error && response.statusCode == 200) {
@@ -33,7 +33,7 @@ setInterval(function() {
       var date = new Date(feed.header.timestamp.low*1000);
       var data = {
         date: date.toString(),
-        entities: feed.entity
+        entities: feed.entity[0]
       };
       console.log(date.toString());
       sockets.forEach(function(socket) {
@@ -41,8 +41,13 @@ setInterval(function() {
       });
     }
   });
-}, 5000);
+};
+
+setInterval(function() {
+  fetchData();
+}, 18000);
 
 io.on('connection', function (socket) {
   sockets.push(socket);
+  fetchData();
 });
