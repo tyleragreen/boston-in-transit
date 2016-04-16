@@ -10,7 +10,7 @@ var express = require('express');
 var socketio = require('socket.io');
 var GtfsRealtimeBindings = require('gtfs-realtime-bindings');
 var request = require('request');
-var gtfs = require ('app/gtfs');
+var gtfs = require ('gtfs');
 
 var router = express();
 var server = http.createServer(router);
