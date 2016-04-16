@@ -25,8 +25,11 @@ coverage
 build/Release
 
 # Dependency directory
+!node_modules/
 node_modules/*
-!node_modules/app/gtfs
+!node_modules/app/
+node_modules/app/*
+!node_modules/app/gtfs/
 
 # Optional npm cache directory
 .npm
