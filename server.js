@@ -10,6 +10,7 @@ var express = require('express');
 var socketio = require('socket.io');
 var GtfsRealtimeBindings = require('gtfs-realtime-bindings');
 var request = require('request');
+var gtfs = require ('gtfs');
 
 var router = express();
 var server = http.createServer(router);
@@ -48,7 +49,9 @@ var fetchData = function() {
         entities: feed.entity
       };
       console.log(date.toString());
-      
+      gtfs.agencies(function(err,agencies){
+        console.log(agencies);
+      });
       // Broadcast the data to all connected clients
       sockets.forEach(function(socket) {
         socket.emit('update', data);
