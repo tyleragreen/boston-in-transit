@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: black;
+  color: white;
+  font-family: 'Open Sans Condensed', sans-serif;
+  overflow: hidden;
+}
+#map {
+  position: absolute;
+  top: 60;
+  bottom: 0;
+  width: 100%;
+}
+.sidePanel {
+  right: -330px;
+  top: 0;
+  height: 100%;
+  z-index: 9999;
+  padding: 15px;
+  position: absolute;
+  background: black;
+  width: 300px;
+  -webkit-transition: left 400ms ease;
+  -ms-transition: left 400ms ease;
+  -o-transition: left 400ms ease;
+  -moz-transition: left 400ms ease;
+  transition: left 400ms ease;
+}
+.sidePanel a {
+  color: white;
+}
+.sideOpen {
+  right: 0px;
+}
