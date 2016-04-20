@@ -24,6 +24,15 @@ var requestSettings = {
   encoding: null
 };
 
+var formatDate = function(date) {
+  var days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"];
+  
+  var date_str = days[date.getDay()] + ", " + months[date.getMonth()] + " " + date.getDate() + ", " + date.getFullYear() + " " + String("00" + date.getHours()).slice(-2) + ":" + String("00" + date.getMinutes()).slice(-2) + ":" + String("00" + date.getSeconds()).slice(-2)  + " GMT+" + date.getTimezoneOffset();
+  
+  return date_str;
+};
+
 // Set up Express to fetch the client from a subdirectory
 router.use(express.static(path.resolve(__dirname, 'client')));
 
@@ -41,10 +50,10 @@ var fetchData = function() {
     if (!error && response.statusCode == 200) {
       var feed = GtfsRealtimeBindings.FeedMessage.decode(body);
       var date = new Date(feed.header.timestamp.low*1000);
-      
+     
       // Package the data to send to the client into an object
       var data = {
-        date: date.toString(),
+        date: formatDate(date),
         entities: feed.entity
       };
       console.log(date.toString());
