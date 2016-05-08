@@ -1,4 +1,6 @@
-function Controller($scope) {
+var pg = require('pg');
+
+function Controller($scope, $http) {
   var socket = io.connect();
   var lat = '';
   var long = '';
@@ -18,7 +20,15 @@ function Controller($scope) {
   });
   
   markerLayer.on('click', function(e) {
-    $scope.trip_id = e.layer.tripId;
+    $http.get('/api/v1/todos')
+      .success(function(data){
+        $scope.trip_id = data;
+        console.log(data);
+      })
+      .error(function(error) {
+        console.log('Error: ' + error);
+      });
+    //$scope.trip_id = e.layer.tripId;
     $scope.$apply();
     $('.sidePanel').addClass('sideOpen');
   });
