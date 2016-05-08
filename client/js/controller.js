@@ -1,5 +1,3 @@
-var pg = require('pg');
-
 function Controller($scope, $http) {
   var socket = io.connect();
   var lat = '';
