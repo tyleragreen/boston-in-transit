@@ -18,15 +18,19 @@ function Controller($scope, $http) {
   });
   
   markerLayer.on('click', function(e) {
-    $http.get('/api/v1/todos')
-      .success(function(data){
-        $scope.trip_id = data;
-        console.log(data);
-      })
-      .error(function(error) {
-        console.log('Error: ' + error);
+    $http.get('/api/v1/trip/' + e.layer.tripId)
+      .then(function successCallback(response) {
+        if (response.data.length > 0) {
+          $scope.route_name = response.data[0].route_short_name;
+          $scope.headsign = response.data[0].trip_headsign;
+          console.log(JSON.stringify(response.data));
+        } else {
+          $scope.route_name = 'Green Line';
+          $scope.headsign = 'More info coming soon!';
+        }
+      }, function errorCallback(response) {
+        console.log(response.data);
       });
-    //$scope.trip_id = e.layer.tripId;
     $scope.$apply();
     $('.sidePanel').addClass('sideOpen');
   });

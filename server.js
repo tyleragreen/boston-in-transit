@@ -7,6 +7,7 @@
 var http = require('http');
 var path = require('path');
 var express = require('express');
+var bodyParser = require('body-parser');
 var socketio = require('socket.io');
 var GtfsRealtimeBindings = require('gtfs-realtime-bindings');
 var request = require('request');
@@ -15,6 +16,9 @@ var pg = require('pg');
 var router = express();
 var server = http.createServer(router);
 var io = socketio.listen(server);
+
+router.use(bodyParser.json()); // for parsing application/json
+router.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 
 // Initialize a list of connections to this server
 var sockets = [];
@@ -37,7 +41,7 @@ var formatDate = function(date) {
 // Set up Express to fetch the client from a subdirectory
 router.use(express.static(path.resolve(__dirname, 'client')));
 
-router.get('/api/v1/todos', function(req,res) {
+router.get('/api/v1/trip/:id', function(req,res) {
   var results = [];
   pg.connect(connectionString, function(err, client, done){
     if (err) {
@@ -45,16 +49,15 @@ router.get('/api/v1/todos', function(req,res) {
       console.log(err);
       return res.status(500).json({success: false, data: err});
     }
-    
-    var query = client.query("SELECT * FROM test");
+    var query = client.query("SELECT * FROM trips t INNER JOIN routes r ON t.route_id=r.route_id WHERE t.trip_id=$1", [req.params.id]);
     query.on('row', function(row) {
       results.push(row);
     });
     query.on('end',function() {
       done();
+      console.log(results);
       return res.json(results);
     });
-    //  return res.json({ help: 'you got it' });
   });
 });
 
