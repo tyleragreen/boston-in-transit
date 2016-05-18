@@ -11,17 +11,27 @@ function Controller($scope, $http) {
       .setView([42.358056, -71.063611], 10);
   var markerLayer = L.mapbox.featureLayer().addTo(map);
   
-  $.getJSON('gtfs.geojson', function(data) { 
-    var geojson = L.geoJson(data, {
-      style: { fillColor: 'blue' }
-    }).addTo(map);
+  $.getJSON('gtfs.geojson', function(data) {
+    var lines = [];
+    data.features.forEach(function (line, index) {
+      $http.get('/api/v1/route_color/' + line.properties.name)
+        .then(function successCallback(response) {
+          L.geoJson(line, {
+            style: { color: '#' + response.data[0].route_color,
+                     opacity: 1
+                   }
+          }).addTo(map);
+        }, function errorCallback(response) {
+          console.log(response.data);
+        });
+    });
   });
   
   markerLayer.on('click', function(e) {
     $http.get('/api/v1/trip/' + e.layer.tripId)
       .then(function successCallback(response) {
         if (response.data.length > 0) {
-          $scope.route_name = response.data[0].route_short_name;
+          $scope.route_name = response.data[0].route_long_name === null ? response.data[0].route_short_name : response.data[0].route_long_name;
           $scope.headsign = response.data[0].trip_headsign;
           console.log(JSON.stringify(response.data));
         } else {

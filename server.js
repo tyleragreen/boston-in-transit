@@ -61,6 +61,26 @@ router.get('/api/v1/trip/:id', function(req,res) {
   });
 });
 
+router.get('/api/v1/route_color/:id', function(req,res) {
+  var results = [];
+  pg.connect(connectionString, function(err, client, done){
+    if (err) {
+      done();
+      console.log(err);
+      return res.status(500).json({success: false, data: err});
+    }
+    var query = client.query("SELECT DISTINCT r.route_id, r.route_color FROM routes r JOIN trips t ON r.route_id=t.route_id JOIN shapes s ON t.shape_id=s.shape_id WHERE s.shape_id=$1", [req.params.id]);
+    query.on('row', function(row) {
+      results.push(row);
+    });
+    query.on('end',function() {
+      done();
+      console.log(results);
+      return res.json(results);
+    });
+  });
+});
+
 // Start the http server
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function() {
   var addr = server.address();
@@ -70,7 +90,7 @@ server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function() 
 // Fetch the data from the GTFS-realtime source and broadcast it to all 
 // connected clients over the socket
 var fetchData = function() {
-  console.log("Fetching API...");
+  console.log("Fetching GTFS-realtime info...");
   request(requestSettings, function(error, response, body) {
     if (!error && response.statusCode == 200) {
       var feed = GtfsRealtimeBindings.FeedMessage.decode(body);
