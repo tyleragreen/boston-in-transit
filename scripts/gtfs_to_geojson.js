@@ -11,11 +11,10 @@ var getRouteColors = function(client, callback) {
     colorsByShapeId[row.shape_id] = row.route_color;
   });
   colors_query.on('end', function() {
-    callback(colorsByShapeId);
+    callback(null, colorsByShapeId);
   });
   colors_query.on('error', function(err) {
-    console.log(err);
-    process.exit(1);
+    callback(err, null);
   });
 };
 
@@ -33,8 +32,7 @@ var getRoutes = function(client, callback) {
     callback(null, routes);
   });
   shapes_query.on('error', function(err) {
-    console.log(err);
-    process.exit(1);
+    callback(err, null);
   });
 };
 

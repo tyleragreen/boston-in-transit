@@ -12,18 +12,23 @@ function Controller($scope, $http) {
   var markerLayer = L.mapbox.featureLayer().addTo(map);
   
   $.getJSON('gtfs.geojson', function(data) { 
-    var geojson = L.geoJson(data, {
-      style: { fillColor: 'blue' }
-    }).addTo(map);
+    data.features.forEach(function (line, index) {
+      L.geoJson(line, {
+        style: { color: '#' + line.properties.stroke,
+                 opacity: 1
+               }
+      }).addTo(map);
+    });
   });
   
   markerLayer.on('click', function(e) {
     $http.get('/api/v1/trip/' + e.layer.tripId)
       .then(function successCallback(response) {
+        console.log('Trip id:',e.layer.tripId);
         if (response.data.length > 0) {
-          $scope.route_name = response.data[0].route_short_name;
+          $scope.route_name = response.data[0].route_long_name === null ? response.data[0].route_short_name : response.data[0].route_long_name;
           $scope.headsign = response.data[0].trip_headsign;
-          console.log(JSON.stringify(response.data));
+          //console.log(JSON.stringify(response.data));
         } else {
           $scope.route_name = 'Green Line';
           $scope.headsign = 'More info coming soon!';

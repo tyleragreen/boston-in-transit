@@ -55,27 +55,6 @@ router.get('/api/v1/trip/:id', function(req,res) {
     });
     query.on('end',function() {
       done();
-      console.log(results);
-      return res.json(results);
-    });
-  });
-});
-
-router.get('/api/v1/route_color/:id', function(req,res) {
-  var results = [];
-  pg.connect(connectionString, function(err, client, done){
-    if (err) {
-      done();
-      console.log(err);
-      return res.status(500).json({success: false, data: err});
-    }
-    var query = client.query("SELECT DISTINCT r.route_id, r.route_color FROM routes r JOIN trips t ON r.route_id=t.route_id JOIN shapes s ON t.shape_id=s.shape_id WHERE s.shape_id=$1", [req.params.id]);
-    query.on('row', function(row) {
-      results.push(row);
-    });
-    query.on('end',function() {
-      done();
-      console.log(results);
       return res.json(results);
     });
   });
