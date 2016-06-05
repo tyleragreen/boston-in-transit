@@ -9,26 +9,32 @@ pg.connect(connectionString, function(err, client, done){
     process.exit(1);
   }
   var routes = {};
-  var query = client.query('SELECT * FROM shapes ORDER BY shape_id, shape_pt_sequence'); 
-  query.on('row', function(row) {
+  var shapes_query = client.query('SELECT * FROM shapes ORDER BY shape_id, shape_pt_sequence'); 
+  shapes_query.on('row', function(row) {
     if (routes[row.shape_id] == null) {
       routes[row.shape_id] = [row];
     } else {
       routes[row.shape_id].push(row);
     }
   });
-  query.on('end', function() {
+  shapes_query.on('end', function() {
     var features = [];
-    for (var route_key in routes) {
-      console.log('route ' + route_key);
+    for (var shape_id in routes) {
+      console.log('route ' + shape_id);
       var coordinates = [];
-      for (var point in routes[route_key]) {
-        console.log(point);
-        coordinates.push([point.shape_pt_lon,point.shape_pt_lat]);
-      }
-      var feature = { 'type':'Feature', 'properties': { 'name':route_key }, 'geometry': {'type':'LineString','coordinates':coordinates}};
-      features.push(feature);
+      routes[shape_id].forEach(function(row) {
+        coordinates.push([row.shape_pt_lon,row.shape_pt_lat]);
+      });
+      var color_query = client.query("SELECT DISTINCT r.route_color FROM routes r JOIN trips t ON r.route_id=t.route_id JOIN shapes s ON t.shape_id=s.shape_id WHERE s.shape_id='$1'", [shape_id]);
+      var color = null;
+      color_query.on('row',function(row){
+        color = row.route_color;
+        console.log(color);
+        var feature = { 'type':'Feature', 'properties': { 'name':shape_id,'stroke':color }, 'geometry': {'type':'LineString','coordinates':coordinates}};
+        features.push(feature);
+      });
     }
+    while (features.length != routes.length) { }
     features = {'type':'FeatureCollection','features':features};
     console.log('done'); 
     fs.writeFile('gtfs.geojson',JSON.stringify(features), function(err) {
