@@ -85,7 +85,7 @@ CREATE TABLE shapes
   shape_pt_lat      double precision NOT NULL,
   shape_pt_lon      double precision NOT NULL,
   shape_pt_sequence integer NOT NULL,
-  shape_dist_traveled double precision NULL
+  shape_dist_traveled text NULL
 );
 
 CREATE TABLE trips
