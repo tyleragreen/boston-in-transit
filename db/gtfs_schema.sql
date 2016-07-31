@@ -1,3 +1,5 @@
+# This scheme script is heavily based on Christian Roman's version at https://github.com/chroman/df-gtfs/blob/master/schema.sql
+
 DROP TABLE agency;
 DROP TABLE feed_info;
 DROP TABLE stops;
