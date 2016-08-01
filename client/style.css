@@ -27,8 +27,12 @@ body {
   -moz-transition: left 400ms ease;
   transition: left 400ms ease;
 }
-.sidePanel a {
+a {
   color: white;
+  text-decoration: underline;
+}
+a:hover {
+  text-decoration: none;
 }
 .sideOpen {
   right: 0px;
