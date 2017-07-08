@@ -22,7 +22,6 @@ router.use(bodyParser.urlencoded({ extended: true })); // for parsing applicatio
 
 // Initialize a list of connections to this server
 var sockets = [];
-var connectionString = 'postgres://thebusrider:3ll3board!@gtfs.cotldmpxktwb.us-west-2.rds.amazonaws.com:5432/gtfs';
 var requestSettings = {
   method: 'GET',
   url: 'http://developer.mbta.com/lib/GTRTFS/Alerts/VehiclePositions.pb',
@@ -40,25 +39,6 @@ var formatDate = function(date) {
 
 // Set up Express to fetch the client from a subdirectory
 router.use(express.static(path.resolve(__dirname, 'client')));
-
-router.get('/api/v1/trip/:id', function(req,res) {
-  var results = [];
-  pg.connect(connectionString, function(err, client, done){
-    if (err) {
-      done();
-      console.log(err);
-      return res.status(500).json({success: false, data: err});
-    }
-    var query = client.query("SELECT * FROM trips t INNER JOIN routes r ON t.route_id=r.route_id WHERE t.trip_id=$1", [req.params.id]);
-    query.on('row', function(row) {
-      results.push(row);
-    });
-    query.on('end',function() {
-      done();
-      return res.json(results);
-    });
-  });
-});
 
 // Start the http server
 server.listen(process.env.PORT || 3000, process.env.IP || "0.0.0.0", function() {
